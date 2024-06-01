@@ -1,0 +1,32 @@
+.dice {
+
+    background: #b6bfd3;
+    width: 100%;
+    min-height: 800px;
+  }
+  
+  .dice-menu {
+    position: relative;
+    background-color: #2a52a8;
+    width: 150px;
+    height: 100px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }
+  
+canvas {
+  position: absolute;
+  border: 1px solid black;
+    min-width:  420px;
+    min-height: 600px;
+    pointer-events: none;
+  }
+
+  /* Дополнительные стили */
+  button {
+    margin-top: 10px;
+  }
+  

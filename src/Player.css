@@ -1,0 +1,32 @@
+.playerAudio { 
+    position: absolute;
+    top: 2px;
+    right: 10px;
+}
+
+.player {
+    position: relative;
+    top: 6px;
+}
+
+.tabs {
+    margin-bottom: 20px;
+  }
+  
+  .tabs button {
+    margin: 0 10px;
+  }
+  
+  .tabs button.active {
+    font-weight: bold;
+  }
+
+.play {
+  margin: 5px;
+  padding: 10px;
+}
+
+.pause {
+    margin: 5px;
+    padding: 10px;
+  }
