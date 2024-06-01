@@ -1,13 +1,11 @@
 import React from 'react';
 import './App.css'
-import DiceRoller from './DiceRoller';
-import StreamPlayer from './components/StreamPlayer.js';
+import UserSetAPIdddice from './UserSetAPIdddice.js'
 
 const App = () => {
   return (
     <div>
-      <DiceRoller />
-      <StreamPlayer/>
+      <UserSetAPIdddice />
     </div>
   );
 }

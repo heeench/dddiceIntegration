@@ -8,25 +8,57 @@
   .dice-menu {
     position: relative;
     background-color: #2a52a8;
-    width: 150px;
-    height: 100px;
+    width: 430px;
+    height: 200px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     font-size: calc(10px + 2vmin);
-    color: white;
   }
   
-canvas {
-  position: absolute;
-  border: 1px solid black;
+  canvas {
+    position: absolute;
+    border: 1px solid black;
     min-width:  420px;
     min-height: 600px;
     pointer-events: none;
   }
 
   /* Дополнительные стили */
-  button {
-    margin-top: 10px;
+  .rollbutton {
+    position: relative;
+    top: 32px;
   }
-  
+
+  .rollInput {
+    position: relative;
+    top: 32px;
+  }
+
+  .diceBar button {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    border-radius: 30px;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    cursor: pointer;
+  }
+  img {
+    position: relative;
+    z-index: 999;
+    top: -1px;
+    right: 3px;
+  }
+
+  img:hover {
+    position: relative;
+    z-index: 999;
+    top: -1px;
+    right: 3px;
+    width: 40px;
+    height: 40px;
+  }
