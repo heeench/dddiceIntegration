@@ -1,23 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { ThreeDDice } from 'dddice-js';
 import './Dice.css';
-import icon_d4 from './assets/game-icons--d4.png'
-import icon_d6 from './assets/game-icons--perspective-dice-six.png'
-import icon_d8 from './assets/game-icons--dice-eight-faces-eight.png'
-import icon_d10 from './assets/game-icons--d10.png'
-import icon_d12 from './assets/game-icons--d12.png'
-import icon_d20 from './assets/game-icons--dice-twenty-faces-twenty.png'
+import icon_d4 from './assets/game-icons--d4.png';
+import icon_d6 from './assets/game-icons--perspective-dice-six.png';
+import icon_d8 from './assets/game-icons--dice-eight-faces-eight.png';
+import icon_d10 from './assets/game-icons--d10.png';
+import icon_d12 from './assets/game-icons--d12.png';
+import icon_d20 from './assets/game-icons--dice-twenty-faces-twenty.png';
 
+const diceIcons = {
+  d4: icon_d4,
+  d6: icon_d6,
+  d8: icon_d8,
+  d10: icon_d10,
+  d12: icon_d12,
+  d20: icon_d20
+};
 
 const DiceRoller = ({ token, roomSlug }) => {
-  const [diceType, setDiceType] = useState('d6');
-  const [diceCount, setDiceCount] = useState(1);
+  const [formula, setFormula] = useState('');
   const [result, setResult] = useState('');
   const [activationCode, setActivationCode] = useState(localStorage.getItem('activationCode') || '');
-  const [activationSecret, setActivationSecret] = useState(localStorage.getItem('activationSecret') || '')
+  const [activationSecret, setActivationSecret] = useState(localStorage.getItem('activationSecret') || '');
   const [apiKey, setApiKey] = useState('');
   const [activationStatus, setActivationStatus] = useState(false);
   const [dddice, setDddice] = useState(null);
+  const [isHidden, setIsHidden] = useState(false)
 
   useEffect(() => {
     if (token && roomSlug && token !== '[object Object]' && roomSlug !== '[object Object]') {
@@ -40,7 +48,7 @@ const DiceRoller = ({ token, roomSlug }) => {
         method: "POST",
         headers,
       })
-      .then(response => {
+        .then(response => {
           if (!response.ok) {
             throw new Error('Failed to generate activation code');
           }
@@ -56,7 +64,7 @@ const DiceRoller = ({ token, roomSlug }) => {
         .catch(error => console.error('Error:', error));
     }
   };
- 
+
   const pollActivationStatus = (code, secret) => {
     if (token !== '[object Object]' && roomSlug !== '[object Object]') {
       const intervalId = setInterval(() => {
@@ -86,21 +94,54 @@ const DiceRoller = ({ token, roomSlug }) => {
     }
   };
 
-  console.log("code: " + activationCode + "\nsecret: " + activationSecret + 
-              "\nstatus: " + activationStatus + "\napiToken: " + apiKey + "\nroomSlug: " + roomSlug);
-
-  const resultRoll = () => {
-    let totalResult = 0;
-    for (let i = 0; i < diceCount; i++) {
-      const roll = Math.floor(Math.random() * parseInt(diceType.slice(1)) + 1);
-      totalResult += roll;
-    }
-    setResult(totalResult);
-    rollDice(totalResult);
+  const handleDiceClick = (type) => {
+    const newFormula = updateFormula(formula, type);
+    setFormula(newFormula);
   };
 
-  const rollDice = (totalResult) => {
-    if (!token) {
+  const updateFormula = (currentFormula, type) => {
+    const regex = new RegExp(`(\\d*)${type}`, 'g');
+    const match = regex.exec(currentFormula);
+
+    if (match) {
+      const count = parseInt(match[1] || '1', 10) + 1;
+      return currentFormula.replace(regex, `${count}${type}`);
+    }
+
+    return currentFormula ? `${currentFormula} + 1${type}` : `1${type}`;
+  };
+
+  const parseFormula = (formula) => {
+    const regex = /(\d+)(d\d+)/g;
+    let match;
+    const diceSettings = [];
+
+    while ((match = regex.exec(formula)) !== null) {
+      diceSettings.push({ type: match[2], count: parseInt(match[1], 10) });
+    }
+
+    return diceSettings;
+  };
+
+  const resultRoll = () => {
+    const diceSettings = parseFormula(formula);
+    let totalResult = 0;
+    let rollResults = [];
+
+    diceSettings.forEach(dice => {
+      for (let i = 0; i < dice.count; i++) {
+        const roll = Math.floor(Math.random() * parseInt(dice.type.slice(1)) + 1);
+        totalResult += roll;
+        rollResults.push({ type: dice.type, result: roll });
+      }
+    });
+
+    setResult(`Итого: ${totalResult}\n${rollResults.map(r => `${r.type}: ${r.result}`).join('\n')}`);
+    rollDice(rollResults);
+  };
+
+  const rollDice = (rollResults) => {
+    if (!apiKey) {
       alert('Пожалуйста, сгенерируйте код активации и после выполните показанную инструкцию для броска кубиков');
       return;
     }
@@ -112,13 +153,12 @@ const DiceRoller = ({ token, roomSlug }) => {
     };
 
     const body = {
-      "dice": [
-        {
-          "type": `${diceType}`,
-          "theme": "dddice-bees",
-          "value": `${totalResult}`
-        }
-      ],
+      "dice": rollResults.map(dice => ({
+        "type": dice.type,
+        "theme": "dddice-bees",
+        "value": dice.result,
+        "is_hidden": isHidden
+      })),
       "room": `${roomSlug}`,
     };
 
@@ -130,52 +170,37 @@ const DiceRoller = ({ token, roomSlug }) => {
       .then(response => response.json());
   };
 
-/* WS connect, send result all users*/
+  const clearFormula = () => {
+    setFormula('');
+  };
+
+  const hideRoll = () => {
+    setIsHidden(prev => !prev);
+
+    
+  }
+
 
   return (
     <div className="dice">
-      
       <div className="dice-menu">
-        <div className='diceBar' value={diceType}>
-          <button value='d4' onClick={(e) => setDiceType('d4')}>
-            <img src={icon_d4} alt='Custom Icon' width="42" height="42"></img>
-          </button>
-
-          <button value='d6' onClick={(e) => setDiceType('d6')}>
-            <img src={icon_d6} alt='Custom Icon' width="42" height="42"></img>
-          </button>
-
-          <button value='d8' onClick={(e) => setDiceType('d8')}>
-            <img src={icon_d8} alt='Custom Icon' width="42" height="42"></img>
-          </button>
-
-          <button value='d10' onClick={(e) => setDiceType('d10')}>
-            <img src={icon_d10} alt='Custom Icon' width="42" height="42"></img>
-          </button>
-
-          <button value='d12' onClick={(e) => setDiceType('d12')}>
-            <img src={icon_d12} alt='Custom Icon' width="42" height="42"></img>
-          </button>
-
-          <button value='d20' onClick={(e) => setDiceType('d20')}>
-            <img src={icon_d20} alt='Custom Icon' width="42" height="42"></img>
-          </button>
-
-          <button value='d10x' onClick={(e) => setDiceType('d100')}>
-            <img src={icon_d10} alt='Custom Icon' width="42" height="42"></img>
-          </button>
-
-        </div>
-        <input
-          className='rollInput'
-          type="number"
-          value={diceCount}
-          onChange={(e) => setDiceCount(e.target.value)}
-          min="1"
-          max="25"
-        />
-        <button className='rollbutton' onClick={resultRoll}>Roll Dice!</button>
-        <p>{result}</p>
+        {Object.keys(diceIcons).map((type) => (
+          <div key={type} className="dice-setting">
+            <img
+              src={diceIcons[type]}
+              alt={type}
+              width="42"
+              height="42"
+              onClick={() => handleDiceClick(type)}
+              style={{ cursor: 'pointer' }}
+            />
+          </div>
+        ))}
+        <button className='roll' onClick={resultRoll}>Бросить кубики!</button>
+        <button className='clearRoll' onClick={clearFormula}>Очистить формулу</button>
+        <button className='hideRoll' onClick={hideRoll}>{!isHidden ? 'Скрыть бросок' : 'Показать бросок'}</button>
+        <p className='result'>{result}</p>
+        <p className='formula'>Формула: {formula}</p>
       </div>
       {!activationStatus && (
         <div className="activation">
@@ -194,5 +219,3 @@ const DiceRoller = ({ token, roomSlug }) => {
 }
 
 export default DiceRoller;
-
-

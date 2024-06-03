@@ -1,33 +1,30 @@
 .dice {
-
-    background: #b6bfd3;
+    background: #ece6db;
     width: 100%;
     min-height: 800px;
   }
   
   .dice-menu {
     position: relative;
-    background-color: #2a52a8;
+    background-color: #8d0909d1;
     width: 430px;
-    height: 200px;
+    height: 250px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     font-size: calc(10px + 2vmin);
+    border-radius: 20px;
+    color: white;
+    font-size: 18px;
   }
   
   canvas {
     position: absolute;
+    top: 2px;
     border: 1px solid black;
-    min-width:  420px;
-    min-height: 600px;
+    width:  1400px;
+    height: 800px;
     pointer-events: none;
-  }
-
-  /* Дополнительные стили */
-  .rollbutton {
-    position: relative;
-    top: 32px;
   }
 
   .rollInput {
@@ -35,13 +32,14 @@
     top: 32px;
   }
 
-  .diceBar button {
+  .dice-setting  {
     position: relative;
     width: 50px;
     height: 50px;
     margin: 5px;
     border-radius: 30px;
     border: none;
+    display: inline-block;
     align-items: center;
     justify-content: center;
     background-color: transparent;
@@ -61,4 +59,44 @@
     right: 3px;
     width: 40px;
     height: 40px;
+  }
+
+  .result {
+    position: absolute;
+    top: 100px;
+    left: 0px;
+    color: white;
+    width: 100px;
+    height: 100px;
+  }
+
+  .formula {
+    position: absolute;
+    top: 80px;
+    left: 0px;
+    color: white;
+    width: 300px;
+    height: 100px;
+  }
+
+  .roll {
+    position:absolute;
+    border: none;
+    border-radius: 20px;
+    top: 70px;
+    left: 10px;
+  }
+  .clearRoll {
+    position:absolute;
+    border: none;
+    border-radius: 20px;
+    top: 70px;
+    left: 130px;
+  }
+  .hideRoll {
+    position:absolute;
+    border: none;
+    border-radius: 20px;
+    top: 70px;
+    left: 270px;
   }
